@@ -2,7 +2,7 @@ import streamlit as st
 import random
 import os
 
-TOTAL_COMPLIMENTS = 16
+TOTAL_COMPLIMENTS = 40
 
 
 def read_compliments():
@@ -65,7 +65,7 @@ def main():
                               "разговаривает с вами на вашем языке! Пусть любовь, внимание, комфорт и забота "
                               "будут обличены именно в ту форму, которая нужна именно вам! Благополучия и "
                               "процветания! Всего всего самого-самого!!")
-                st.header(compliment)
+                st.subheader(compliment)
                 st.audio("sm.mp3", format="audio/mpeg", loop=True)
                 # st.image("sunrise.jpg", caption="Sunrise by the mountains")
 
