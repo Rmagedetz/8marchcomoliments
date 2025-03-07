@@ -1,76 +1,66 @@
 import streamlit as st
 import random
 import os
+import shutil
 
-TOTAL_COMPLIMENTS = 40
-
-
-def read_compliments():
-    try:
-        with open("compliments.txt", "r", encoding="utf-8") as file:
-            compliments = file.readlines()
-        return [c.strip() for c in compliments]
-    except Exception as e:
-        st.error(f"Ошибка при чтении файла: {e}")
-        return []
+messages_total = 4
+messages_in_use_dir = "messages"
+pictures_in_use_dir = "pictures"
+no_use_msg_pics = "no_use"
 
 
-def write_compliments(compliments):
-    try:
-        with open("compliments.txt", "w", encoding="utf-8") as file:
-            for compliment in compliments:
-                file.write(compliment + "\n")
-    except Exception as e:
-        st.error(f"Ошибка при записи в файл: {e}")
+def get_messages_count():
+    messages = os.listdir(messages_in_use_dir)
+    return messages_total - len(messages)
 
 
-def remove_compliment(compliment):
-    compliments = read_compliments()
-    compliment = compliment.strip()
-    if compliment in compliments:
-        compliments.remove(compliment)
-        write_compliments(compliments)
+def get_text():
+    messages = os.listdir(messages_in_use_dir)
+    msg_file = random.choice(messages)
+
+    old_file_path = os.path.join(messages_in_use_dir, msg_file)
+    new_file_path = os.path.join(no_use_msg_pics, msg_file)
+
+    shutil.move(old_file_path, new_file_path)
+
+    with open(new_file_path, "r", encoding="utf-8") as file:
+        msg_text = file.read().strip()
+
+    return msg_text
 
 
-def get_random_compliment_and_picture():
-    compliments = read_compliments()
-    if compliments:
-        compliment = random.choice(compliments)
-        remove_compliment(compliment)
-    else:
-        compliment = "Сегодня все комплименты использованы!"
+def get_pic():
+    pictures = os.listdir(pictures_in_use_dir)
+    picture_file = random.choice(pictures)
 
-    picture = random.choice(os.listdir("pictures"))
-    return compliment, picture, len(compliments)
+    old_pic_path = os.path.join(pictures_in_use_dir, picture_file)
+    new_pic_path = os.path.join(no_use_msg_pics, picture_file)
+
+    shutil.move(old_pic_path, new_pic_path)
+
+    return new_pic_path
 
 
 def main():
-    compliments = read_compliments()
-    if st.button("Получить послание"):
-        compliment, picture, remaining_count = get_random_compliment_and_picture()
-
-        if remaining_count > 0:
+    messages_sended = get_messages_count()
+    if st.button("Получить послание", key="get_message"):
+        if messages_sended != messages_total:
+            message = get_text()
+            picture = get_pic()
             col1, col2 = st.columns(2)
             with st.container(border=True):
                 with col2:
-                    compliment = compliment.replace("-", " --")
-                    st.warning(compliment)
+                    message = message.replace("-", " --")
+                    st.warning(message)
                 with col1:
-                    st.image(f"pictures/{picture}", use_container_width=True)
+                    st.image(picture, use_container_width=True)
+            st.write(f"Посланий получено {messages_sended + 1} из {messages_total}")
         else:
             with st.container(border=True):
-                compliment = ("Милые наши дамы!! От всей мужской части компании поздравляем вас с этим прекрасным "
-                              "днём, а также с завтрашним, послезавтрашним и"
-                              "всеми последующими, потому что каждый день - ваш день! Пусть окружающая реальность "
-                              "разговаривает с вами на вашем языке! Пусть любовь, внимание, комфорт и забота "
-                              "будут обличены именно в ту форму, которая нужна именно вам! Благополучия и "
-                              "процветания! Всего всего самого-самого!!")
-                st.subheader(compliment)
+                with open("final_message.txt", "r", encoding="utf-8") as file:
+                    final_msg_text = file.read().strip()
+                st.text(final_msg_text)
                 st.audio("sm.mp3", format="audio/mpeg", loop=True)
-                # st.image("sunrise.jpg", caption="Sunrise by the mountains")
-
-        sent_count = TOTAL_COMPLIMENTS - len(compliments)
-        st.write(f"Посланий получено {sent_count} из {TOTAL_COMPLIMENTS}")
 
 
 if __name__ == "__main__":
