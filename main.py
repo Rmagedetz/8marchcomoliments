@@ -57,10 +57,10 @@ def main():
             st.write(f"Посланий получено {messages_sended + 1} из {messages_total}")
         else:
             with st.container(border=True):
+                st.audio("sm.mp3", format="audio/mpeg", loop=True)
                 with open("final_message.txt", "r", encoding="utf-8") as file:
                     final_msg_text = file.read().strip()
                 st.text(final_msg_text)
-                st.audio("sm.mp3", format="audio/mpeg", loop=True)
 
 
 if __name__ == "__main__":
