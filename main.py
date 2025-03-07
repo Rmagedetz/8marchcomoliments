@@ -3,7 +3,7 @@ import random
 import os
 import shutil
 
-messages_total = 4
+messages_total = 133
 messages_in_use_dir = "messages"
 pictures_in_use_dir = "pictures"
 no_use_msg_pics = "no_use"
